@@ -1,0 +1,61 @@
+customer:               #Customer for whom we are onboarding Security Hub
+customer_id: 
+
+master_account: 
+  account_number:        # Account number or master accout
+  primary_region:
+  secondary region:
+  keys: security keys     #keys to access the master account
+  cis_controls: true       # boolean true/false
+  pci_dss: false
+  aws_foundational_controls: false
+
+
+member_accounts:            #Member accounts will be linked to Master Account. Can be empty.
+  member_account: 
+      account_number:        # Account number or member accout  
+      primary_region:
+      secondary region:
+      keys: security keys   #keys to access the member account
+      cis_controls: true
+      pci_dss: false
+      aws_foundational_controls: false
+   
+  member_account: 
+      account_number: number  
+      primary_region:
+      secondary region:   
+      keys: security keys   #keys to access the member account
+      cis_controls: true
+      pci_dss: false
+      aws_foundational_controls: false
+
+master_account_controls:
+    primary_region:
+      config_scope: global   #global/local
+      cis_controls_to_enable:    # This will get picked up only when cis_controls is true
+                    CIS.1.13: true   # true for enabling control. false for disabling control.
+                    CIS.1.14: false
+                    #.... other CIS controls will be documented      
+
+    secondary_region:
+      config_scope: local   #global/local
+      cis_controls_to_enable:    # This will get picked up only when cis_controls is true
+                    CIS.1.13: true
+                    CIS.1.14: false
+                    #.... other CIS controls will be documented
+
+member_account_controls:
+    primary_region:
+      config_scope: global   #global/local
+      cis_controls_to_enable:    # This will get picked up only when cis_controls is true
+                    CIS.1.13: true
+                    CIS.1.14: false
+                    #.... other CIS controls will be documented      
+
+    secondary_region:
+      config_scope: local   #global/local
+      cis_controls_to_enable:
+                    CIS.1.13: true
+                    CIS.1.14: false
+                    #.... other CIS controls will be documented                         
