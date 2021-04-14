@@ -59,8 +59,8 @@ def get_cis_control_details_for_account(member_account_id):
                 #f.close() 
 
                 #Publish these findings to SNS/Netcool when findings is not empty
-                #if findings["Findings"]:
-                    #send_to_sns(json.dumps(findings))                              
+                if findings["Findings"]:
+                    send_to_sns(json.dumps(findings))                              
             i=i+1                    
 
     except Exception as e:
@@ -115,8 +115,7 @@ def send_to_sns(event):
         response = sns.publish(
             TopicArn='arn:aws:sns:us-west-2:802878444238:test_topic',   #TopicArn to be replaced with the Topic to publish to Netcool
             Message=event,     
-        )            
-        #message_id = response['MessageId']     
+        )               
     except Exception as e:
         print("Unable to publish Event to SNS Topic:", e)  
 
