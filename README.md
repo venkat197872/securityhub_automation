@@ -45,8 +45,5 @@ Please check the "PublicCloudSecurity_MVP1 V0.4.pptx" presentation for more deta
 
 Name | eMail
 -----|------
-Alwyn Lobo | lalwyn@in.ibm.com
-Alexander Keller| alexk@us.ibm.com
 Jigar Kapasi | kjigar@in.ibm.com
-Pradeep Chandrasekhar | pradeepch@in.ibm.com
 Venkat Reddy | venkatre@in.ibm.com
