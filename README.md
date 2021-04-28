@@ -6,11 +6,11 @@
 This repo contains SecurityHub onboarding artifacts.
 
 ## Architecture
-Multi Account, Multi Region Reference Architecture
-![alt text](./images/ReferenceArchitecture1.png "Multi Account, Multi Region Reference Architecture")
-
 Multi Account Reference Architecture
 ![alt text](./images/ReferenceArchitecture2.png "Multi Account Reference Architecture")
+
+Multi Account, Multi Region Reference Architecture
+![alt text](./images/SecurityHub_deployment_ref_arch.png "Multi Account, Multi Region Reference Architecture")
 
 ## Objective
 This repo contains SecurityHub onboarding artifacts.
@@ -45,5 +45,8 @@ Please check the "PublicCloudSecurity_MVP1 V0.4.pptx" presentation for more deta
 
 Name | eMail
 -----|------
+Alwyn Lobo | lalwyn@in.ibm.com
+Alexander Keller| alexk@us.ibm.com
 Jigar Kapasi | kjigar@in.ibm.com
+Pradeep Chandrasekhar | pradeepch@in.ibm.com
 Venkat Reddy | venkatre@in.ibm.com
