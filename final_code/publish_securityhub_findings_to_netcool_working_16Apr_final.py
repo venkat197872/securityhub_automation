@@ -2,6 +2,7 @@ import json
 import boto3	
 import os.path
 import argparse
+import re
 from botocore.config import Config
 
 #Lambda Handler invocation function
@@ -52,15 +53,33 @@ def get_cis_control_details_for_account(member_account_id):
                 control_arn_new = control_arn.replace(account_id, member_account_id)
                 print("Fetching findings for cis control arn : ",control_arn_new)
                 findings = get_cis_control_findings(control_arn_new) 
+                cis_event = {}
+
+                #Build findings JSON to be sent to Netcool
+                if findings["Findings"]:
+                    cis_event["Account3LetterCode"] = account_3letter_code
+                    cis_event["Provider"] = "aws"
+                    cis_event["AwsAccountId"] = findings["Findings"][0]["AwsAccountId"]
+                    cis_event["Region"] = region                   
+                    cis_event["RuleId"] = "CIS."+findings["Findings"][0]["ProductFields"]["RuleId"]  
+                    cis_event["Title"] = findings["Findings"][0]["Title"]
+                    cis_event["Description"] = findings["Findings"][0]["Description"]   
+                    cis_event["StandardsControlArn"] = findings["Findings"][0]["ProductFields"]["StandardsControlArn"]                                                                           
+                    cis_event["ProductArn"] = findings["Findings"][0]["ProductArn"]
+                    cis_event["GeneratorId"] = findings["Findings"][0]["GeneratorId"]                    
+                    cis_event["RemediationUrl"] = findings["Findings"][0]["Remediation"]["Recommendation"]["Url"]                    
+                    cis_event["Severity"] = "Medium" #findings["Findings"][0]["Severity"]["Label"] #Sending constant severity of Medium to Netcool/ServiceNow
+                    cis_event["NumberOfFindings"] = "There are "+str(len(findings["Findings"]))+" findings in this CIS control."
+
+                    #Publish these findings to SNS/Netcool when findings is not empty
+                    #send_to_sns(json.dumps(cis_event))  
+
+                #print(cis_event)            
                 #print(i)
                 #filename= "C:\\GTS\\MCMS\\code\\cis_findings\\"+member_account_id+"\\"+cis_controls[i]["ControlId"]+".txt"             
                 #f = open(filename, "w")
-                #f.write(json.dumps(findings))
-                #f.close() 
-
-                #Publish these findings to SNS/Netcool when findings is not empty
-                if findings["Findings"]:
-                    send_to_sns(json.dumps(findings))                              
+                #f.write(json.dumps(cis_event))
+                #f.close()                               
             i=i+1                    
 
     except Exception as e:
@@ -115,7 +134,7 @@ def send_to_sns(event):
         response = sns.publish(
             TopicArn='arn:aws:sns:us-west-2:802878444238:test_topic',   #TopicArn to be replaced with the Topic to publish to Netcool
             Message=event,     
-        )               
+        )              
     except Exception as e:
         print("Unable to publish Event to SNS Topic:", e)  
 
@@ -123,38 +142,46 @@ def send_to_sns(event):
 #Fetch Security Hub findings per CIS control and post them to SNS topic/Netcool
 print("hello world2")
 
-parser = argparse.ArgumentParser(description='Link AWS Accounts to central SecurityHub Account')
-parser.add_argument('--enabled_regions', type=str, help="comma separated list of regions to enable SecurityHub. If not specified, all available regions enabled")
-args = parser.parse_args()
+try:
+    parser = argparse.ArgumentParser(description='Fetch cis control findings from central SecurityHub Account')
+    parser.add_argument('--account_3letter_code', type=str, help="3 letter code of customer account. This 3 letter code is sent to Netcool, ServiceNow.")
+    parser.add_argument('--enabled_regions', type=str, help="comma separated list of regions to enable SecurityHub. If not specified, all available regions enabled.")
+    args = parser.parse_args()
 
-# Getting SecurityHub regions
-session = boto3.session.Session()
+    # Validate account 3 letter code
+    account_3letter_code = args.account_3letter_code    
+    if not re.match(r'[A-Za-z0-9]{3}',account_3letter_code):
+        raise ValueError("Account 3 letter code is not valid")
 
-securityhub_regions = []
-if args.enabled_regions:
-    securityhub_regions = [str(item) for item in args.enabled_regions.split(',')]
-    print("Enabling members in these regions: {}".format(securityhub_regions))
-else:
-    securityhub_regions = session.get_available_regions('securityhub')
-    print("Enabling members in all available SecurityHub regions {}".format(securityhub_regions))
+    # Getting SecurityHub regions
+    session = boto3.session.Session()
+    securityhub_regions = []
+    if args.enabled_regions:
+        securityhub_regions = [str(item) for item in args.enabled_regions.split(',')]
+        print("Enabling members in these regions: {}".format(securityhub_regions))
+    else:
+        securityhub_regions = session.get_available_regions('securityhub')
+        print("Enabling members in all available SecurityHub regions {}".format(securityhub_regions))
 
-#Processing each Region & enabling securityhub in that region
-for region in securityhub_regions:
-        print("Region name is:", region)
-        #region = 'us-west-2'
-        my_config = Config(
-            region_name=region,
-            signature_version = 'v4',
-            retries = {
-                'max_attempts': 10,
-                'mode': 'standard'
-            }
-        )
+    #Processing each Region & enabling securityhub in that region
+    for region in securityhub_regions:
+            print("Region name is:", region)
+            #region = 'us-west-2'
+            my_config = Config(
+                region_name=region,
+                signature_version = 'v4',
+                retries = {
+                    'max_attempts': 10,
+                    'mode': 'standard'
+                }
+            )
 
-        shclient = boto3.client('securityhub',config=my_config)
-        sns = boto3.client('sns',config=my_config)
-        sts = boto3.client("sts",config=my_config)
-        account_id = sts.get_caller_identity()["Account"]   
-        
-        #Get security hub findings for a region
-        get_security_hub_findings()         
+            shclient = boto3.client('securityhub',config=my_config)
+            sns = boto3.client('sns',config=my_config)
+            sts = boto3.client("sts",config=my_config)
+            account_id = sts.get_caller_identity()["Account"]   
+            
+            #Get security hub findings for a region
+            get_security_hub_findings()   
+except Exception as e:
+    print("Unable to initialize playbook: ", e)                 

@@ -1,28 +1,12 @@
 # aws_security_hub_automation
 
-# AWS Security Hub Onboarding, Automation
-
-## Context / User story
-
-
-## Architecture
-
-
-Multi Account Reference Architecture
-
-
-## Objective
-
-
-## Requirements
-None
-
-## Variables (Configured as extra variables in Job Template)
-
-
 ## How to configure, execute the program to fetch Findings and send to Netcool
 ```
-usage: publish_securityhub_findings_to_netcool_working_14Apr_final.py
+usage: publish_securityhub_findings_to_netcool_working_16Apr_final.py --account_3letter_code AccountCode --enabled_regions ENABLED_REGIONS
+
+required arguments:
+  --account_3letter_code AccountCode
+                         3 letter code of the customer account. 
 
 optional arguments:
   --enabled_regions ENABLED_REGIONS
@@ -32,13 +16,13 @@ optional arguments:
 ```
 Examples:
 Run below sample command command to fetch findings from specific regions like us-west-1,us-west-2 and send them to Netcool:
-`publish_securityhub_findings_to_netcool_working_14Apr_final.py --enabled_regions us-west-1,us-west-2`
+`publish_securityhub_findings_to_netcool_working_16Apr_final.py --account_3letter_code RRR --enabled_regions us-west-2`
 
 Run below sample command to fetch findings from all regions:
-`publish_securityhub_findings_to_netcool_working_14Apr_final.py`
+`publish_securityhub_findings_to_netcool_working_16Apr_final.py --account_3letter_code RRR`
 
 ## Outcomes
-The program will pick findings per cis control for each region, master/member accounts and post them as tickets to ServiceNow. Existing tickets will be updated. One CIS control per region, account will be created as one ticket in ServiceNow. 
+The program will pick findings per cis control for each region, master/member accounts and post them as tickets to ServiceNow. One CIS control per region, account will be created as one ticket in ServiceNow. 
 
 
 ## Other Info
