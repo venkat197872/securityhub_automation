@@ -1,9 +1,7 @@
-# aws_security_hub_automation
-
-# AWS Security Hub Onboarding, Automation
+# AWS Security Hub reference architecture, implementation
 
 ## Context / User story
-This repo contains SecurityHub onboarding artifacts.
+The Readme is still work in progress. The This repo contains SecurityHub onboarding artifacts.
 
 ## Architecture
 Multi Account Reference Architecture
